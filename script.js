@@ -1,6 +1,23 @@
 import * as THREE from "three";
 import gsap from "gsap";
 
+const sizes = {
+  width: 800,
+  height: 600,
+};
+
+//cursor
+const cursor = {
+  x: 0,
+  y: 0,
+};
+
+window.addEventListener("mousemove", (event) => {
+  // - 0.5 so that the middle is 0
+  cursor.x = event.clientX / sizes.width - 0.5;
+  cursor.y = event.clientY / sizes.height - 0.5;
+});
+
 const canvas = document.querySelector("canvas.webgl");
 
 const scene = new THREE.Scene();
@@ -13,13 +30,24 @@ const mesh = new THREE.Mesh(
 //add cube to group instead of scene
 scene.add(mesh);
 
-const sizes = {
-  width: 800,
-  height: 600,
-};
-
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
-camera.position.set(0, 0, 3);
+const camera = new THREE.PerspectiveCamera(
+  75,
+  sizes.width / sizes.height,
+  0.1,
+  100,
+);
+const aspectRatio = sizes.width / sizes.height;
+//const camera = new THREE.OrthographicCamera(
+//  -1 * aspectRatio,
+//  1 * aspectRatio,
+//  1,
+//  -1,
+// 0.1,
+//  100,
+//);
+//camera.position.set(2, 2, 2);
+camera.position.z = 3;
+camera.lookAt(mesh.position);
 scene.add(camera);
 
 const axesHelper = new THREE.AxesHelper(2);
@@ -31,36 +59,18 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setSize(sizes.width, sizes.height);
 
-gsap.to(mesh.position, { duration: 1, delay: 1, x: 2 });
-gsap.to(mesh.position, { duration: 1, delay: 2, x: 0 });
-
 const clock = new THREE.Clock();
-// let time = Date.now();
-//animation
-//this tick is the game look
-//functions on every frame
 const tick = () => {
-  //higher framerate will equal faster rotation if done without time check way,
-  //so will need to use the time value to make things consistent
+  //mesh.rotation.y = clock.getElapsedTime();
+  //camera.position.set(cursor.x, -cursor.y, 2);
+  //circle camera movement
+  // sin and cos combined make the circle shape, timesing the position by pi2 gets the 360 rotation, *3 makes it further away
+  camera.position.x = Math.sin(cursor.x * (Math.PI * 2)) * 3;
+  camera.position.z = Math.cos(cursor.x * (Math.PI * 2)) * 3;
+  camera.position.y = cursor.y * 3;
+  camera.lookAt(mesh.position);
 
-  //get timestamp in milliseconds
-  //const currentTime = Date.now();
-  //get difference between the current time and the previous time
-  //const deltaTime = currentTime - time;
-  //once delaTime is found, reset time to current time
-  //time = currentTime;
-
-  //three js has built in timing as well
-  //use pi to rotate 1 per second
-  //mesh.rotation.y = clock.getElapsedTime() * Math.PI * 2;
-
-  //below is example of circular motion
-  //mesh.rotation.y = Math.sin(clock.getElapsedTime()); // up and down movement
-  //mesh.rotation.x = Math.cos(clock.getElapsedTime()); // up and down movement
-
-  //need to render everytime things are recalculated
   renderer.render(scene, camera);
-
   window.requestAnimationFrame(tick);
 };
 
