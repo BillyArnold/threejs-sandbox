@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import gsap from "gsap";
 
 const sizes = {
@@ -60,15 +61,24 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 
 const clock = new THREE.Clock();
+
+//controls
+const controls = new OrbitControls(camera, canvas);
+//damping
+controls.enableDamping = true;
+
 const tick = () => {
   //mesh.rotation.y = clock.getElapsedTime();
   //camera.position.set(cursor.x, -cursor.y, 2);
   //circle camera movement
   // sin and cos combined make the circle shape, timesing the position by pi2 gets the 360 rotation, *3 makes it further away
-  camera.position.x = Math.sin(cursor.x * (Math.PI * 2)) * 3;
-  camera.position.z = Math.cos(cursor.x * (Math.PI * 2)) * 3;
-  camera.position.y = cursor.y * 3;
-  camera.lookAt(mesh.position);
+  //camera.position.x = Math.sin(cursor.x * (Math.PI * 2)) * 3;
+  //camera.position.z = Math.cos(cursor.x * (Math.PI * 2)) * 3;
+  //camera.position.y = cursor.y * 3;
+  //camera.lookAt(mesh.position);
+
+  //update controls
+  controls.update();
 
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
