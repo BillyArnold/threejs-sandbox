@@ -1,43 +1,18 @@
 import * as THREE from "three";
+import gsap from "gsap";
 
 const canvas = document.querySelector("canvas.webgl");
 
 const scene = new THREE.Scene();
 
-/*
- * Objects
- */
-//use groups to apply rotation scale etc to multiple objects at once
-const group = new THREE.Group();
-scene.add(group);
-
 //creating mesh directly instead of separately adding geometry and material
-const cube1 = new THREE.Mesh(
+const mesh = new THREE.Mesh(
   new THREE.BoxGeometry(1, 1, 1),
   new THREE.MeshBasicMaterial({ color: "red" }),
 );
 //add cube to group instead of scene
-group.add(cube1);
+scene.add(mesh);
 
-const cube2 = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial({ color: "purple" }),
-);
-cube2.position.x = -2;
-group.add(cube2);
-
-const cube3 = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial({ color: "green" }),
-);
-cube3.position.x = 2;
-group.add(cube3);
-
-group.position.y = 1;
-group.scale.y = 2;
-group.rotation.y = 1;
-//add a camera
-//fov, aspect
 const sizes = {
   width: 800,
   height: 600,
@@ -56,4 +31,37 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setSize(sizes.width, sizes.height);
 
-renderer.render(scene, camera);
+gsap.to(mesh.position, { duration: 1, delay: 1, x: 2 });
+gsap.to(mesh.position, { duration: 1, delay: 2, x: 0 });
+
+const clock = new THREE.Clock();
+// let time = Date.now();
+//animation
+//this tick is the game look
+//functions on every frame
+const tick = () => {
+  //higher framerate will equal faster rotation if done without time check way,
+  //so will need to use the time value to make things consistent
+
+  //get timestamp in milliseconds
+  //const currentTime = Date.now();
+  //get difference between the current time and the previous time
+  //const deltaTime = currentTime - time;
+  //once delaTime is found, reset time to current time
+  //time = currentTime;
+
+  //three js has built in timing as well
+  //use pi to rotate 1 per second
+  //mesh.rotation.y = clock.getElapsedTime() * Math.PI * 2;
+
+  //below is example of circular motion
+  //mesh.rotation.y = Math.sin(clock.getElapsedTime()); // up and down movement
+  //mesh.rotation.x = Math.cos(clock.getElapsedTime()); // up and down movement
+
+  //need to render everytime things are recalculated
+  renderer.render(scene, camera);
+
+  window.requestAnimationFrame(tick);
+};
+
+tick();
