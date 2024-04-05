@@ -3,9 +3,21 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import gsap from "gsap";
 
 const sizes = {
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
+
+window.addEventListener("resize", () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  //update camera
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  //update renderer
+  renderer.setSize(sizes.width, sizes.height);
+});
 
 //cursor
 const cursor = {
@@ -17,6 +29,27 @@ window.addEventListener("mousemove", (event) => {
   // - 0.5 so that the middle is 0
   cursor.x = event.clientX / sizes.width - 0.5;
   cursor.y = event.clientY / sizes.height - 0.5;
+});
+
+window.addEventListener("dblclick", () => {
+  const fullscreenElement =
+    document.fullscreenElement || document.webkitFullScreenElement;
+
+  if (!fullscreenElement) {
+    //enter full screen
+    if (canvas.requestFullscreen) {
+      canvas.requestFullscreen();
+    } else if (canvas.webkitRequestFullScreen) {
+      canvas.webkitRequestFullScreen();
+    }
+  } else {
+    //leave fullscreen
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else {
+      document.webkitExitFullscreen();
+    }
+  }
 });
 
 const canvas = document.querySelector("canvas.webgl");
@@ -37,16 +70,6 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100,
 );
-const aspectRatio = sizes.width / sizes.height;
-//const camera = new THREE.OrthographicCamera(
-//  -1 * aspectRatio,
-//  1 * aspectRatio,
-//  1,
-//  -1,
-// 0.1,
-//  100,
-//);
-//camera.position.set(2, 2, 2);
 camera.position.z = 3;
 camera.lookAt(mesh.position);
 scene.add(camera);
@@ -59,6 +82,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 const clock = new THREE.Clock();
 
