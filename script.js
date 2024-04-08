@@ -56,10 +56,22 @@ const canvas = document.querySelector("canvas.webgl");
 
 const scene = new THREE.Scene();
 
+//create buffer geometry
+//use float32array as it's more performant
+//create xyz for every vertex
+const positionsArray = new Float32Array([0, 0, 0, 0, 1, 0, 1, 0, 0]);
+
+//second param is the number of values per vertex, so xyz
+const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
+
+const geometry = new THREE.BufferGeometry();
+
+geometry.setAttribute("position", positionsAttribute);
+
 //creating mesh directly instead of separately adding geometry and material
 const mesh = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial({ color: "red" }),
+  geometry,
+  new THREE.MeshBasicMaterial({ color: "red", wireframe: true }),
 );
 //add cube to group instead of scene
 scene.add(mesh);
@@ -84,23 +96,12 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-const clock = new THREE.Clock();
-
 //controls
 const controls = new OrbitControls(camera, canvas);
 //damping
 controls.enableDamping = true;
 
 const tick = () => {
-  //mesh.rotation.y = clock.getElapsedTime();
-  //camera.position.set(cursor.x, -cursor.y, 2);
-  //circle camera movement
-  // sin and cos combined make the circle shape, timesing the position by pi2 gets the 360 rotation, *3 makes it further away
-  //camera.position.x = Math.sin(cursor.x * (Math.PI * 2)) * 3;
-  //camera.position.z = Math.cos(cursor.x * (Math.PI * 2)) * 3;
-  //camera.position.y = cursor.y * 3;
-  //camera.lookAt(mesh.position);
-
   //update controls
   controls.update();
 
