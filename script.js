@@ -1,6 +1,21 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import gsap from "gsap";
+import GUI from "lil-gui";
+
+//Debug
+const gui = new GUI({
+  width: 340,
+  title: "UI naming",
+  closeFolders: true,
+});
+//gui.hide() can hide debug, below hides on h key
+window.addEventListener("keydown", (event) => {
+  if (event.key == "h") {
+    gui.show(gui._hidden);
+  }
+});
+const debugObject = {};
 
 const sizes = {
   width: window.innerWidth,
@@ -56,30 +71,52 @@ const canvas = document.querySelector("canvas.webgl");
 
 const scene = new THREE.Scene();
 
-//create buffer geometry
-//use float32array as it's more performant
-//create xyz for every vertex
-const count = 50;
-//*3 and *3 because of 3 vertices and each one has 3 values
-const positionsArray = new Float32Array(count * 3 * 3);
+debugObject.color = "red";
+debugObject.subdivision = 2;
+const material = new THREE.MeshBasicMaterial({
+  color: debugObject.color,
+  wireframe: true,
+});
 
-for (let i = 0; i < count * 3 * 3; i++) {
-  positionsArray[i] = (Math.random() - 0.5) * 4;
-}
-//second param is the number of values per vertex, so xyz
-const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
-
-const geometry = new THREE.BufferGeometry();
-
-geometry.setAttribute("position", positionsAttribute);
+const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
 
 //creating mesh directly instead of separately adding geometry and material
-const mesh = new THREE.Mesh(
-  geometry,
-  new THREE.MeshBasicMaterial({ color: "red", wireframe: true }),
-);
+const mesh = new THREE.Mesh(geometry, material);
 //add cube to group instead of scene
 scene.add(mesh);
+
+const cubeTweaks = gui.addFolder("Cube Stuff");
+//debug y
+//params are min max step for drag and drop
+cubeTweaks.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation");
+cubeTweaks.add(mesh, "visible");
+cubeTweaks.add(material, "wireframe");
+cubeTweaks
+  .addColor(debugObject, "color")
+  .onChange(() => material.color.set(debugObject.color));
+
+debugObject.spin = () => {
+  gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 });
+};
+
+gui
+  .add(debugObject, "subdivision")
+  .min(1)
+  .max(20)
+  .step(1)
+  .onFinishChange(() => {
+    mesh.geometry.dispose();
+    mesh.geometry = new THREE.BoxGeometry(
+      1,
+      1,
+      1,
+      debugObject.subdivision,
+      debugObject.subdivision,
+      debugObject.subdivision,
+    );
+  });
+
+gui.add(debugObject, "spin");
 
 const camera = new THREE.PerspectiveCamera(
   75,
