@@ -59,8 +59,13 @@ const scene = new THREE.Scene();
 //create buffer geometry
 //use float32array as it's more performant
 //create xyz for every vertex
-const positionsArray = new Float32Array([0, 0, 0, 0, 1, 0, 1, 0, 0]);
+const count = 50;
+//*3 and *3 because of 3 vertices and each one has 3 values
+const positionsArray = new Float32Array(count * 3 * 3);
 
+for (let i = 0; i < count * 3 * 3; i++) {
+  positionsArray[i] = (Math.random() - 0.5) * 4;
+}
 //second param is the number of values per vertex, so xyz
 const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
 
