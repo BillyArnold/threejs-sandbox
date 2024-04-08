@@ -3,6 +3,38 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import gsap from "gsap";
 import GUI from "lil-gui";
 
+//Textures
+const loadingManager = new THREE.LoadingManager();
+loadingManager.onStart = () => {
+  console.log("load start");
+};
+loadingManager.onLoaded = () => {
+  console.log("loading finished");
+};
+loadingManager.onProgress = () => {
+  console.log("progress loading");
+};
+loadingManager.onError = () => {
+  console.log("error loading");
+};
+
+const textureLoader = new THREE.TextureLoader(loadingManager);
+const colorTexture = textureLoader.load("./images/door/color.jpg");
+colorTexture.colorSpace = THREE.SRGBColorSpace;
+
+const alphaTexture = textureLoader.load("./images/door/opacity.jpg");
+const heightTexture = textureLoader.load("./images/door/height.png");
+const normalTexture = textureLoader.load("./images/door/normal.jpg");
+const ambientOcclusionTexture = textureLoader.load(
+  "./images/door/ambientOcclusion.jpg",
+);
+const metalnessTexture = textureLoader.load("./images/door/metallic.jpg");
+const roughnessTexture = textureLoader.load("./images/door/roughness.jpg");
+
+colorTexture.generateMipmaps = false;
+
+colorTexture.minFilter = THREE.NearestFilter;
+
 //Debug
 const gui = new GUI({
   width: 340,
@@ -74,15 +106,13 @@ const scene = new THREE.Scene();
 debugObject.color = "red";
 debugObject.subdivision = 2;
 const material = new THREE.MeshBasicMaterial({
-  color: debugObject.color,
-  wireframe: true,
+  //color: debugObject.color,
+  wireframe: false,
+  map: colorTexture,
 });
 
 const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
-
-//creating mesh directly instead of separately adding geometry and material
 const mesh = new THREE.Mesh(geometry, material);
-//add cube to group instead of scene
 scene.add(mesh);
 
 const cubeTweaks = gui.addFolder("Cube Stuff");
