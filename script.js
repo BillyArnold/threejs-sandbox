@@ -1,183 +1,150 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import gsap from "gsap";
 import GUI from "lil-gui";
+import typefaceFont from "three/examples/fonts/helvetiker_regular.typeface.json";
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 
-//Textures
-const loadingManager = new THREE.LoadingManager();
-loadingManager.onStart = () => {
-  console.log("load start");
-};
-loadingManager.onLoaded = () => {
-  console.log("loading finished");
-};
-loadingManager.onProgress = () => {
-  console.log("progress loading");
-};
-loadingManager.onError = () => {
-  console.log("error loading");
-};
+/**
+ * Base
+ */
+// Debug
+const gui = new GUI();
 
-const textureLoader = new THREE.TextureLoader(loadingManager);
-const colorTexture = textureLoader.load("./images/door/color.jpg");
-colorTexture.colorSpace = THREE.SRGBColorSpace;
+// Canvas
+const canvas = document.querySelector("canvas.webgl");
 
-const alphaTexture = textureLoader.load("./images/door/opacity.jpg");
-const heightTexture = textureLoader.load("./images/door/height.png");
-const normalTexture = textureLoader.load("./images/door/normal.jpg");
-const ambientOcclusionTexture = textureLoader.load(
-  "./images/door/ambientOcclusion.jpg",
-);
-const metalnessTexture = textureLoader.load("./images/door/metallic.jpg");
-const roughnessTexture = textureLoader.load("./images/door/roughness.jpg");
+// Scene
+const scene = new THREE.Scene();
 
-colorTexture.generateMipmaps = false;
+const axesHelper = new THREE.AxesHelper();
+scene.add(axesHelper);
 
-colorTexture.minFilter = THREE.NearestFilter;
+/**
+ * Textures
+ */
+const textureLoader = new THREE.TextureLoader();
+const matcapTexture = textureLoader.load("./images/matcaps/8.png");
+matcapTexture.colorSpace = THREE.SRGBColorSpace;
 
-//Debug
-const gui = new GUI({
-  width: 340,
-  title: "UI naming",
-  closeFolders: true,
-});
-//gui.hide() can hide debug, below hides on h key
-window.addEventListener("keydown", (event) => {
-  if (event.key == "h") {
-    gui.show(gui._hidden);
+/**
+ * Font loads
+ */
+const fontLoader = new FontLoader();
+fontLoader.load("./fonts/helvetiker_regular.typeface.json", (font) => {
+  const textGeometry = new TextGeometry("Hello Three.js", {
+    font: font,
+    size: 0.5,
+    height: 0.2,
+    curveSegments: 4,
+    bevelEnabled: true,
+    bevelThickness: 0.03,
+    bevelSize: 0.02,
+    bevelOffset: 0,
+    bevelSegments: 4,
+  });
+
+  // textGeometry.computeBoundingBox();
+  // // -0.2 because of bezel and height, 0.5 because half the distance
+  // // move geometry instead of mesh to change rotate origin
+  // textGeometry.translate(
+  //   - (textGeometry.boundingBox.max.x - 0.02) * 0.5,
+  //   - (textGeometry.boundingBox.max.y - 0.02) * 0.5,
+  //   - (textGeometry.boundingBox.max.z - 0.03) * 0.5
+  // );
+  textGeometry.center();
+
+  const textMaterial = new THREE.MeshMatcapMaterial({ wireframe: false });
+  textMaterial.matcap = matcapTexture;
+
+  const text = new THREE.Mesh(textGeometry, textMaterial);
+
+  scene.add(text);
+
+  const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 40);
+
+  for (let i = 0; i < 200; i++) {
+    const donut = new THREE.Mesh(donutGeometry, textMaterial);
+
+    donut.position.x = (Math.random() - 0.5) * 10;
+    donut.position.y = (Math.random() - 0.5) * 10;
+    donut.position.z = (Math.random() - 0.5) * 10;
+
+    donut.rotation.x = Math.random() * Math.PI;
+    donut.rotation.y = Math.random() * Math.PI;
+
+    const scale = Math.random();
+    donut.scale.set(scale, scale, scale);
+
+    scene.add(donut);
   }
 });
-const debugObject = {};
 
+/**
+ * Sizes
+ */
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
 
 window.addEventListener("resize", () => {
+  // Update sizes
   sizes.width = window.innerWidth;
   sizes.height = window.innerHeight;
 
-  //update camera
+  // Update camera
   camera.aspect = sizes.width / sizes.height;
   camera.updateProjectionMatrix();
 
-  //update renderer
+  // Update renderer
   renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-//cursor
-const cursor = {
-  x: 0,
-  y: 0,
-};
-
-window.addEventListener("mousemove", (event) => {
-  // - 0.5 so that the middle is 0
-  cursor.x = event.clientX / sizes.width - 0.5;
-  cursor.y = event.clientY / sizes.height - 0.5;
-});
-
-window.addEventListener("dblclick", () => {
-  const fullscreenElement =
-    document.fullscreenElement || document.webkitFullScreenElement;
-
-  if (!fullscreenElement) {
-    //enter full screen
-    if (canvas.requestFullscreen) {
-      canvas.requestFullscreen();
-    } else if (canvas.webkitRequestFullScreen) {
-      canvas.webkitRequestFullScreen();
-    }
-  } else {
-    //leave fullscreen
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else {
-      document.webkitExitFullscreen();
-    }
-  }
-});
-
-const canvas = document.querySelector("canvas.webgl");
-
-const scene = new THREE.Scene();
-
-debugObject.color = "red";
-debugObject.subdivision = 2;
-const material = new THREE.MeshBasicMaterial({
-  //color: debugObject.color,
-  wireframe: false,
-  map: colorTexture,
-});
-
-const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
-
-const cubeTweaks = gui.addFolder("Cube Stuff");
-//debug y
-//params are min max step for drag and drop
-cubeTweaks.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation");
-cubeTweaks.add(mesh, "visible");
-cubeTweaks.add(material, "wireframe");
-cubeTweaks
-  .addColor(debugObject, "color")
-  .onChange(() => material.color.set(debugObject.color));
-
-debugObject.spin = () => {
-  gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 });
-};
-
-gui
-  .add(debugObject, "subdivision")
-  .min(1)
-  .max(20)
-  .step(1)
-  .onFinishChange(() => {
-    mesh.geometry.dispose();
-    mesh.geometry = new THREE.BoxGeometry(
-      1,
-      1,
-      1,
-      debugObject.subdivision,
-      debugObject.subdivision,
-      debugObject.subdivision,
-    );
-  });
-
-gui.add(debugObject, "spin");
-
+/**
+ * Camera
+ */
+// Base camera
 const camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
   0.1,
   100,
 );
+camera.position.x = 1;
+camera.position.y = 1;
 camera.position.z = 3;
-camera.lookAt(mesh.position);
 scene.add(camera);
 
-const axesHelper = new THREE.AxesHelper(2);
-scene.add(axesHelper);
+// Controls
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
 
+/**
+ * Renderer
+ */
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
-
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-//controls
-const controls = new OrbitControls(camera, canvas);
-//damping
-controls.enableDamping = true;
+/**
+ * Animate
+ */
+const clock = new THREE.Clock();
 
 const tick = () => {
-  //update controls
+  const elapsedTime = clock.getElapsedTime();
+
+  // Update controls
   controls.update();
 
+  // Render
   renderer.render(scene, camera);
+
+  // Call tick again on the next frame
   window.requestAnimationFrame(tick);
 };
 
