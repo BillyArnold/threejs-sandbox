@@ -1,5 +1,7 @@
 import Experience from "../../Experience";
 import * as THREE from "three";
+import testVertexShader from "./Shaders/test/vertex.glsl";
+import testFragmentShader from "./Shaders/test/fragment.glsl";
 
 export default class Flag {
   constructor() {
@@ -35,8 +37,8 @@ export default class Flag {
 
   setMaterial() {
     this.material = new THREE.RawShaderMaterial({
-      vertexShader: "",
-      fragmentShader: "",
+      vertexShader: testVertexShader,
+      fragmentShader: testFragmentShader,
     });
   }
 
