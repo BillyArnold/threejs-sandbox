@@ -26,4 +26,9 @@ export default [
     type: "gltf",
     path: "/images/models/Fox/glTF/Fox.gltf",
   },
+  {
+    name: "flagTexture",
+    type: "texture",
+    path: "/images/flag-french.jpg",
+  },
 ];

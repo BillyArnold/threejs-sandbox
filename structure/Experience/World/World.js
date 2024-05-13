@@ -23,5 +23,9 @@ export default class World {
     if (this.fox) {
       this.fox.update();
     }
+
+    if (this.flag) {
+      this.flag.update();
+    }
   }
 }
