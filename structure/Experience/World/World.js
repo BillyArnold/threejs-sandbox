@@ -4,6 +4,7 @@ import Floor from "./Floor";
 import Environment from "./Environment";
 import * as THREE from "three";
 import Flag from "./Flag/Flag";
+import Test from "./Patterns/Test";
 
 export default class World {
   constructor() {
@@ -14,7 +15,8 @@ export default class World {
     this.resources.on("ready", () => {
       //this.floor = new Floor();
       //this.fox = new Fox();
-      this.flag = new Flag();
+      //this.flag = new Flag();
+      this.test = new Test();
       this.environment = new Environment();
     });
   }
