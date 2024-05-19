@@ -17,6 +17,7 @@ void main() {
 
   //gradient vertical inverse with start point
   float strength = 1.0 - vUv.y;
+  //position varying maybe?
   gl_FragColor = vec4(strength, strength, strength,  1.0);
 }
 
