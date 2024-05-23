@@ -38,8 +38,11 @@ void main() {
   //gl_FragColor = vec4(strength, strength, strength,  1.0);
 
   //minecraft grid
-  vec2 gridUv = vec2(floor(vUv.x * 10.0) / 10.0, floor(vUv.y * 10.0) / 10.0);
-  float strength = random(gridUv);
-  gl_FragColor = vec4(strength, strength, strength,  1.0);
+  //vec2 gridUv = vec2(floor(vUv.x * 10.0) / 10.0, floor(vUv.y * 10.0) / 10.0);
+  //float strength = random(gridUv);
+  //gl_FragColor = vec4(strength, strength, strength,  1.0);
+
+  //perlin noise
+  //these can be found online
 }
 

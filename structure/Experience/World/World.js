@@ -5,6 +5,7 @@ import Environment from "./Environment";
 import * as THREE from "three";
 import Flag from "./Flag/Flag";
 import Test from "./Patterns/Test";
+import Sea from "./Sea/Sea";
 
 export default class World {
   constructor() {
@@ -16,7 +17,8 @@ export default class World {
       //this.floor = new Floor();
       //this.fox = new Fox();
       //this.flag = new Flag();
-      this.test = new Test();
+      //this.test = new Test();
+      this.sea = new Sea();
       this.environment = new Environment();
     });
   }
@@ -28,6 +30,10 @@ export default class World {
 
     if (this.flag) {
       this.flag.update();
+    }
+
+    if (this.sea) {
+      this.sea.update();
     }
   }
 }
