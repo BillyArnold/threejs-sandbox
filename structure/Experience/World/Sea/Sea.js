@@ -13,8 +13,8 @@ export default class Sea {
 
     if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder("Sea");
-      this.debugObject = {};
     }
+    this.debugObject = {};
 
     this.setGeometry();
     this.setTextures();
@@ -23,7 +23,7 @@ export default class Sea {
   }
 
   setGeometry() {
-    this.geometry = new THREE.PlaneGeometry(2, 2, 128, 128);
+    this.geometry = new THREE.PlaneGeometry(2, 2, 512, 512);
   }
 
   setTextures() {
@@ -31,8 +31,8 @@ export default class Sea {
   }
 
   setMaterial() {
-    this.debugObject.depthColor = "#0000ff";
-    this.debugObject.surfaceColor = "#BBBBff";
+    this.debugObject.depthColor = "#186691";
+    this.debugObject.surfaceColor = "#9bd8ff";
 
     this.material = new THREE.ShaderMaterial({
       vertexShader: vertexShader,
@@ -42,10 +42,16 @@ export default class Sea {
         uBigWavesElevation: { value: 0.2 },
         uBigWavesFrequency: { value: new THREE.Vector2(4, 1.5) },
         uBigWavesSpeed: { value: 0.75 },
+        uSmallWavesElevation: { value: 0.15 },
+        uSmallWavesFrequency: { value: 3 },
+        uSmallWavesSpeed: { value: 0.2 },
+        uSmallIterations: { value: 4.0 },
         uDepthColor: { value: new THREE.Color(this.debugObject.depthColor) },
         uSurfaceColor: {
           value: new THREE.Color(this.debugObject.surfaceColor),
         },
+        uColorOffset: { value: 0.08 },
+        uColorMultiplier: { value: 2 },
       },
     });
 
@@ -90,6 +96,54 @@ export default class Sea {
             this.debugObject.surfaceColor,
           );
         });
+
+      this.debugFolder
+        .add(this.material.uniforms.uColorOffset, "value")
+        .min(0)
+        .max(1)
+        .step(0.001)
+        .name("uColorOffset");
+      this.debugFolder
+        .add(this.material.uniforms.uColorMultiplier, "value")
+        .min(0)
+        .max(10)
+        .step(0.001)
+        .name("uColorMultiplier");
+
+      this.debugFolder
+        .add(this.material.uniforms.uBigWavesSpeed, "value")
+        .min(0)
+        .max(4)
+        .step(0.001)
+        .name("uBigWavesSpeed");
+
+      this.debugFolder
+        .add(this.material.uniforms.uSmallWavesElevation, "value")
+        .min(0)
+        .max(1)
+        .step(0.001)
+        .name("uSmallWavesElevation");
+
+      this.debugFolder
+        .add(this.material.uniforms.uSmallWavesFrequency, "value")
+        .min(0)
+        .max(30)
+        .step(0.001)
+        .name("uSmallWavesFrequency");
+
+      this.debugFolder
+        .add(this.material.uniforms.uSmallWavesSpeed, "value")
+        .min(0)
+        .max(4)
+        .step(0.001)
+        .name("uSmallWavesSpeed");
+
+      this.debugFolder
+        .add(this.material.uniforms.uSmallIterations, "value")
+        .min(0)
+        .max(10)
+        .step(1)
+        .name("uSmallIterations");
     }
   }
 
