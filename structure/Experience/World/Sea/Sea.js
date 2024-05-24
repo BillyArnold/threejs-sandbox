@@ -13,6 +13,7 @@ export default class Sea {
 
     if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder("Sea");
+      this.debugObject = {};
     }
 
     this.setGeometry();
@@ -30,6 +31,9 @@ export default class Sea {
   }
 
   setMaterial() {
+    this.debugObject.depthColor = "#0000ff";
+    this.debugObject.surfaceColor = "#BBBBff";
+
     this.material = new THREE.ShaderMaterial({
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
@@ -37,6 +41,11 @@ export default class Sea {
         uTime: { value: 0 },
         uBigWavesElevation: { value: 0.2 },
         uBigWavesFrequency: { value: new THREE.Vector2(4, 1.5) },
+        uBigWavesSpeed: { value: 0.75 },
+        uDepthColor: { value: new THREE.Color(this.debugObject.depthColor) },
+        uSurfaceColor: {
+          value: new THREE.Color(this.debugObject.surfaceColor),
+        },
       },
     });
 
@@ -61,6 +70,26 @@ export default class Sea {
         .max(10)
         .step(0.001)
         .name("uBigWavesFrequencyY");
+
+      this.debugFolder
+        .add(this.material.uniforms.uBigWavesSpeed, "value")
+        .min(0)
+        .max(4)
+        .step(0.001)
+        .name("uBigWavesSpeed");
+
+      this.debugFolder.addColor(this.debugObject, "depthColor").onChange(() => {
+        this.material.uniforms.uDepthColor.value.set(
+          this.debugObject.depthColor,
+        );
+      });
+      this.debugFolder
+        .addColor(this.debugObject, "surfaceColor")
+        .onChange(() => {
+          this.material.uniforms.uSurfaceColor.value.set(
+            this.debugObject.surfaceColor,
+          );
+        });
     }
   }
 
