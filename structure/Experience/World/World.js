@@ -18,6 +18,7 @@ export default class World {
       //this.fox = new Fox();
       //this.flag = new Flag();
       //this.test = new Test();
+      //shader below
       this.sea = new Sea();
       this.environment = new Environment();
     });
