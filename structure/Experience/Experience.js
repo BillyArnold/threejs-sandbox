@@ -1,4 +1,5 @@
 import Sizes from "./Utils/Sizes.js";
+import Loader from "./Loader.js";
 import Resources from "./Utils/Resources.js";
 import Time from "./Utils/Time.js";
 import Camera from "./Camera.js";
@@ -27,6 +28,7 @@ export default class Experience {
     this.time = new Time();
     this.scene = new THREE.Scene();
     this.resources = new Resources(sources);
+    this.loader = new Loader();
     this.camera = new Camera();
     this.renderer = new Renderer();
     this.world = new World();

@@ -14,8 +14,9 @@ export default class World {
     this.resources = this.experience.resources;
 
     this.resources.on("ready", () => {
+      this.experience.loader.fadeOut();
       //this.floor = new Floor();
-      //this.fox = new Fox();
+      this.fox = new Fox();
       //this.flag = new Flag();
       //this.test = new Test();
       //shader below
